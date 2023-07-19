@@ -140,8 +140,10 @@ class OPENBRIDGE(DatagramProtocol):
             _data = _packet[:53]
             _hash = _packet[53:]
             _ckhs = hmac_new(self._config['PASSPHRASE'],_data,sha1).digest()
-
-            if compare_digest(_hash, _ckhs) and _sockaddr == self._config['TARGET_SOCK']:
+            #
+            # check only IP because IPSC2 send the packets with random port
+            #
+            if (compare_digest(_hash, _ckhs) and _sockaddr[0] == self._config['TARGET_SOCK'][0]):
                 _peer_id = _data[11:15]
                 _seq = _data[4]
                 _rf_src = _data[5:8]
