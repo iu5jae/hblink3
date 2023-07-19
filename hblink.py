@@ -26,7 +26,7 @@ file (usually hblink.cfg). It is ALWAYS best practice to ensure that this progra
 works stand-alone before troubleshooting any applications that use it. It has
 sufficient logging to be used standalone as a troubleshooting application.
 '''
-
+from socket import gethostbyname
 # Specifig functions from modules we need
 from binascii import b2a_hex as ahex
 from binascii import a2b_hex as bhex
@@ -263,6 +263,9 @@ class HBSYSTEM(DatagramProtocol):
             self._stats['CONNECTION'] = 'RPTL_SENT'
             self.send_master(b''.join([RPTL, self._config['RADIO_ID']]))
             logger.info('(%s) Sending login request to master %s:%s', self._system, self._config['MASTER_IP'], self._config['MASTER_PORT'])
+            if (len(self._config['MASTER_DNS'].strip()) > 3):
+              self._config['MASTER_IP'] = gethostbyname(self._config['MASTER_DNS'])
+              self._config['MASTER_SOCKADDR'] =  (gethostbyname(self._config['MASTER_IP']), self._config['MASTER_PORT'])
         # If we are connected, sent a ping to the master and increment the counter
         if self._stats['CONNECTION'] == 'YES':
             self.send_master(b''.join([RPTPING, self._config['RADIO_ID']]))
